@@ -94,36 +94,42 @@ router.get('/', [
       WHERE 1=1
     `;
     let params = [];
+    let countParams = [];
 
     // Apply filters
     if (req.query.status) {
       query += ' AND vr.status = ?';
       countQuery += ' AND vr.status = ?';
       params.push(req.query.status);
+      countParams.push(req.query.status);
     }
 
     if (req.query.violator_id) {
       query += ' AND vr.violator_id = ?';
       countQuery += ' AND vr.violator_id = ?';
       params.push(req.query.violator_id);
+      countParams.push(req.query.violator_id);
     }
 
     if (req.query.officer_id) {
       query += ' AND vr.apprehending_officer = ?';
       countQuery += ' AND vr.apprehending_officer = ?';
       params.push(req.query.officer_id);
+      countParams.push(req.query.officer_id);
     }
 
     if (req.query.date_from) {
       query += ' AND vr.date >= ?';
       countQuery += ' AND vr.date >= ?';
       params.push(req.query.date_from);
+      countParams.push(req.query.date_from);
     }
 
     if (req.query.date_to) {
       query += ' AND vr.date <= ?';
       countQuery += ' AND vr.date <= ?';
       params.push(req.query.date_to);
+      countParams.push(req.query.date_to);
     }
 
     query += ' ORDER BY vr.created_at DESC LIMIT ? OFFSET ?';
@@ -131,7 +137,7 @@ router.get('/', [
 
     const [violationRecords, countResult] = await Promise.all([
       executeQuery(query, params),
-      executeQuery(countQuery, params.slice(0, -2))
+      executeQuery(countQuery, countParams)
     ]);
 
     const total = countResult[0].total;

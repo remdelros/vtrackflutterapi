@@ -55,30 +55,35 @@ router.get('/', [
       WHERE 1=1
     `;
     let params = [];
+    let countParams = [];
 
     // Apply filters
     if (req.query.violation_record_id) {
       query += ' AND p.violation_record_id = ?';
       countQuery += ' AND p.violation_record_id = ?';
       params.push(req.query.violation_record_id);
+      countParams.push(req.query.violation_record_id);
     }
 
     if (req.query.payment_method) {
       query += ' AND p.payment_method = ?';
       countQuery += ' AND p.payment_method = ?';
       params.push(req.query.payment_method);
+      countParams.push(req.query.payment_method);
     }
 
     if (req.query.date_from) {
       query += ' AND p.paid_at >= ?';
       countQuery += ' AND p.paid_at >= ?';
       params.push(req.query.date_from);
+      countParams.push(req.query.date_from);
     }
 
     if (req.query.date_to) {
       query += ' AND p.paid_at <= ?';
       countQuery += ' AND p.paid_at <= ?';
       params.push(req.query.date_to);
+      countParams.push(req.query.date_to);
     }
 
     query += ' ORDER BY p.paid_at DESC LIMIT ? OFFSET ?';
@@ -86,7 +91,7 @@ router.get('/', [
 
     const [payments, countResult] = await Promise.all([
       executeQuery(query, params),
-      executeQuery(countQuery, params.slice(0, -2))
+      executeQuery(countQuery, countParams)
     ]);
 
     const total = countResult[0].total;

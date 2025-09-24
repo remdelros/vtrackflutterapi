@@ -55,24 +55,28 @@ router.get('/', [
       WHERE 1=1
     `;
     let params = [];
+    let countParams = [];
 
     // Apply filters
     if (req.query.role_id) {
       query += ' AND u.role_id = ?';
       countQuery += ' AND u.role_id = ?';
       params.push(req.query.role_id);
+      countParams.push(req.query.role_id);
     }
 
     if (req.query.team_id) {
       query += ' AND u.team_id = ?';
       countQuery += ' AND u.team_id = ?';
       params.push(req.query.team_id);
+      countParams.push(req.query.team_id);
     }
 
     if (req.query.is_active !== undefined) {
       query += ' AND u.is_active = ?';
       countQuery += ' AND u.is_active = ?';
       params.push(req.query.is_active);
+      countParams.push(req.query.is_active);
     }
 
     query += ' ORDER BY u.created_at DESC LIMIT ? OFFSET ?';
@@ -80,7 +84,7 @@ router.get('/', [
 
     const [users, countResult] = await Promise.all([
       executeQuery(query, params),
-      executeQuery(countQuery, params.slice(0, -2))
+      executeQuery(countQuery, countParams)
     ]);
 
     const total = countResult[0].total;

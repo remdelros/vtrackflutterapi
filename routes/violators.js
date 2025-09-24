@@ -42,6 +42,7 @@ router.get('/', [
     `;
     let countQuery = 'SELECT COUNT(*) as total FROM violators';
     let params = [];
+    let countParams = [];
 
     if (search) {
       const searchCondition = `
@@ -51,6 +52,7 @@ router.get('/', [
       countQuery += searchCondition;
       const searchParam = `%${search}%`;
       params = [searchParam, searchParam, searchParam, searchParam];
+      countParams = [searchParam, searchParam, searchParam, searchParam];
     }
 
     query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
@@ -58,7 +60,7 @@ router.get('/', [
 
     const [violators, countResult] = await Promise.all([
       executeQuery(query, params),
-      executeQuery(countQuery, params.slice(0, -2)) // Remove limit and offset for count
+      executeQuery(countQuery, countParams)
     ]);
 
     const total = countResult[0].total;

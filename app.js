@@ -52,6 +52,23 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Test endpoint without authentication
+app.get('/api/test-violators', async (req, res) => {
+  try {
+    const { executeQuery } = require('./config/database');
+    const violators = await executeQuery('SELECT * FROM violators LIMIT 5');
+    res.json({
+      success: true,
+      data: violators
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
@@ -76,7 +93,7 @@ app.get('/', (req, res) => {
 app.use(errorHandler);
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use((req, res) => {
   res.status(404).json({
     error: 'Route not found',
     path: req.originalUrl,
